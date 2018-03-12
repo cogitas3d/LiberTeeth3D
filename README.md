@@ -20,11 +20,11 @@ O add-on está em constante desenvolvimento e anda não se encontra completo, a 
 	* Ferramentas de animação (pré e pós dinâmico).
 
 ## Vídeos
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/MrupLznzGss/0.jpg)](https://youtu.be/MrupLznzGss)]
-Digitalização por fotogrametria
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/MrupLznzGss/0.jpg)](https://youtu.be/MrupLznzGss)
+* Digitalização por fotogrametria
 
-[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/frfdYM2h9ec/0.jpg)](https://youtu.be/frfdYM2h9ec)]
-Corte e nominação dos dentes
+[![IMAGE ALT TEXT HERE](https://img.youtube.com/vi/frfdYM2h9ec/0.jpg)](https://youtu.be/frfdYM2h9ec)
+* Corte e nominação dos dentes
 
 ## Como Instalar
 
