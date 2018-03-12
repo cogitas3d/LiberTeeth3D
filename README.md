@@ -44,9 +44,9 @@ Em seguida:
 
 ## Material de Apoio
 
-* Fotos das arcadas superior e inferiorpara digitalização 3D por fotogrametria: https://goo.gl/joChYD
+* Fotos das arcadas superior e inferiorpara digitalização 3D por fotogrametria: https://goo.gl/JuVgWw
 * Tomografia computadorizada (DICOM cone beam) das arcadas superior e inferior: https://goo.gl/48cK5f
-* Metodologia de digitalização 3D de arcadas dentárias por fotogrametria: https://goo.gl/Q2iGBT
+* Metodologia de digitalização 3D de arcadas dentárias por fotogrametria: https://docs.google.com/document/d/1r6PA74dkLy5BTsHPAXe0SEScVpW4zSSMXjC9DLBIIpk/edit?usp=sharing
  
 ### Desenvolvedores
 [Cicero Moraes](http://www.ciceromoraes.com.br) e [Graziane Olimpio](http://www.grazianiodonto.com.br/).
