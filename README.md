@@ -3,7 +3,7 @@
 
 O LiberTeeth3D é um add-on para o Blender voltado ao *setup* de aparelhos ortodônticos.
 
-O add-on está em constante desenvolvimento e anda não se encontra completo, a inserção de novas ferramentas será feita aos poucos.
+Ele está em constante desenvolvimento e ainda não se encontra completo, a inserção de novas ferramentas será feita aos poucos.
 
 ## Ferramentas
 
