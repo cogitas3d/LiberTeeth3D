@@ -15,7 +15,7 @@ Ele está em constante desenvolvimento e ainda não se encontra completo, a inse
 * **Configuração dos dentes**
 	* Seleção da área de interesse da arcada;
 	* Nominação automática dos dentes;
-	* Seleção manual dos dentes ([cut-mesh addon](https://github.com/patmo141/cut_mesh/));
+	* Seleção manual dos dentes;
 	* Ferramentas de referência de alinhamento e simetria;
 	* Ferramentas de animação (pré e pós dinâmico).
 
@@ -28,7 +28,7 @@ Ele está em constante desenvolvimento e ainda não se encontra completo, a inse
 
 ## Como Instalar
 
-Para rodar o LiberTeeth3D você precisa instalar o add-on [OrtogOnBlender]().
+Para rodar o LiberTeeth3D você precisa instalar o add-on [OrtogOnBlender](https://github.com/cogitas3d/OrtogOnBlender).
 
 Em seguida:
 
