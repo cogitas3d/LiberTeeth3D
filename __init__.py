@@ -869,7 +869,322 @@ class liberCriaFotogrametria(bpy.types.Panel):
 #        col.prop(scn.my_tool, "path", text="")
 
 
+# CORTA DESENHO
 
+def LiberCortaDesenhoDef(self, context):
+
+    bpy.ops.gpencil.convert(type='POLY')
+    bpy.ops.gpencil.layer_remove()
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.knife_project()
+    bpy.ops.mesh.delete(type='FACE')
+    bpy.ops.object.editmode_toggle()
+
+
+    bpy.ops.object.select_all(action='DESELECT')
+    a = bpy.data.objects['GP_Layer']
+    a.select = True
+    bpy.context.scene.objects.active = a
+    bpy.ops.object.delete(use_global=False)
+
+class LiberCortaDesenho(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_corta_desenho"
+    bl_label = "Desenha Corte"
+    
+    def execute(self, context):
+        LiberCortaDesenhoDef(self, context)
+        return {'FINISHED'}
+
+# PREPARA DENTES MANUAL SUPERIOR
+
+def LiberPreparaDenteManSupDef(self, context):
+    
+    context = bpy.context
+    obj = context.active_object
+    scn = context.scene
+
+    posicao_1 = bpy.context.scene.cursor_location[2]
+
+    bpy.ops.object.join()
+
+    bpy.ops.object.editmode_toggle()
+
+    bpy.ops.object.mode_set(mode = 'EDIT') 
+
+    bpy.ops.mesh.select_all(action = 'DESELECT')
+
+    bpy.ops.mesh.select_non_manifold()
+
+    bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, 0), "constraint_axis":(False, False, False), "constraint_orientation":'GLOBAL', "mirror":False, "proportional":'DISABLED', "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False})
+
+    bpy.ops.transform.resize(value=(1, 1, 0), constraint_axis=(False, False, True), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1)
+
+#    bpy.ops.mesh.fill()
+
+    bpy.ops.view3d.snap_cursor_to_selected()
+
+    posicao_2 = bpy.context.scene.cursor_location[2]
+    
+    posicao_inicial = posicao_1 - posicao_2
+    
+#   posicao_final = posicao_inicial + 7
+
+    bpy.ops.transform.translate(value=(0, 0, posicao_inicial), constraint_axis=(False, False, True), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1, release_confirm=True)
+
+    bpy.context.space_data.pivot_point = 'INDIVIDUAL_ORIGINS'
+
+
+    bpy.ops.transform.resize(value=(0.4, 0.4, 0.4), constraint_axis=(False, False, False), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1)
+
+    bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, 0), "constraint_axis":(False, False, False), "constraint_orientation":'GLOBAL', "mirror":False, "proportional":'DISABLED', "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False})
+
+    bpy.ops.transform.resize(value=(0, 0, 0), constraint_axis=(False, False, False), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1)
+
+    bpy.context.space_data.pivot_point = 'MEDIAN_POINT'
+
+
+    bpy.ops.view3d.snap_cursor_to_selected()
+    
+    
+    bpy.ops.object.mode_set(mode = 'OBJECT')
+
+    bpy.context.object.name = "CorteManualSup"
+
+
+    bpy.ops.mesh.separate(type='LOOSE')
+    
+# Joga o centro nos dentes
+
+    scene = bpy.context.scene
+    foo_objs = [obj for obj in scene.objects if fnmatch.fnmatchcase(obj.name, "CorteManualSup*")]
+    foo_objs
+
+    elemento = len(foo_objs)
+    numero = 0
+
+    while numero < elemento:
+        objNome = foo_objs[numero].name
+        objeto = bpy.data.objects[objNome]
+        objeto.select = True
+        bpy.context.scene.objects.active = objeto
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+        numero += 1
+
+# Nomeia dentes
+
+    scene = bpy.context.scene
+    foo_objs = [obj for obj in scene.objects if fnmatch.fnmatchcase(obj.name, "CorteManualSup*")]
+    foo_objs
+
+    elemento = len(foo_objs)
+    numero = 0
+
+    menosX ={}
+    maisX = {}
+    menosXordenada = {}
+    maisXordenada = {}
+
+
+    while numero < elemento:
+        coordenadaX = foo_objs[numero].location[0]
+        if coordenadaX < 0:
+            menosX[foo_objs[numero].name] = foo_objs[numero].location[0]
+            menosXordenada = sorted(menosX.items(), key=operator.itemgetter(1), reverse=True)
+
+
+        if coordenadaX > 0:
+            maisX[foo_objs[numero].name] = foo_objs[numero].location[0]
+            maisXordenada = sorted(maisX.items(), key=operator.itemgetter(1))
+
+        numero += 1
+
+
+    numMenos = 0
+    lenMenos = len(menosXordenada)
+    nomeMenos = 11
+
+    while numMenos < lenMenos:
+        objDenteMenos = menosXordenada[numMenos][0]
+        bpy.ops.object.select_all(action='DESELECT')
+        a = bpy.data.objects[objDenteMenos]
+        bpy.context.scene.objects.active = a
+        bpy.context.object.name = str(nomeMenos)
+
+        
+        numMenos += 1
+        nomeMenos += 1
+        
+    numMais = 0
+    lenMais = len(maisXordenada)
+    nomeMais = 21
+
+    while numMais < lenMais:
+        objDenteMais = maisXordenada[numMais][0]
+        bpy.ops.object.select_all(action='DESELECT')
+        a = bpy.data.objects[objDenteMais]
+        bpy.context.scene.objects.active = a
+        bpy.context.object.name = str(nomeMais)
+        
+        numMais += 1
+        nomeMais += 1    
+
+class LiberPreparaDenteManSup(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_manual_superior"
+    bl_label = "Prepara Dentes Manuais Superiores"
+    
+    def execute(self, context):
+        LiberPreparaDenteManSupDef(self, context)
+        return {'FINISHED'}
+
+# PREPARA DENTES MANUAL INFERIOR
+
+def LiberPreparaDenteManInfDef(self, context):
+    
+    context = bpy.context
+    obj = context.active_object
+    scn = context.scene
+
+    posicao_1 = bpy.context.scene.cursor_location[2]
+
+    bpy.ops.object.join()
+
+    bpy.ops.object.editmode_toggle()
+
+    bpy.ops.object.mode_set(mode = 'EDIT') 
+
+    bpy.ops.mesh.select_all(action = 'DESELECT')
+
+    bpy.ops.mesh.select_non_manifold()
+
+    bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, 0), "constraint_axis":(False, False, False), "constraint_orientation":'GLOBAL', "mirror":False, "proportional":'DISABLED', "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False})
+
+    bpy.ops.transform.resize(value=(1, 1, 0), constraint_axis=(False, False, True), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1)
+
+#    bpy.ops.mesh.fill()
+
+    bpy.ops.view3d.snap_cursor_to_selected()
+
+    posicao_2 = bpy.context.scene.cursor_location[2]
+    
+    posicao_inicial = posicao_1 - posicao_2
+    
+#   posicao_final = posicao_inicial + 7
+
+    bpy.ops.transform.translate(value=(0, 0, posicao_inicial), constraint_axis=(False, False, True), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1, release_confirm=True)
+
+    bpy.context.space_data.pivot_point = 'INDIVIDUAL_ORIGINS'
+
+
+    bpy.ops.transform.resize(value=(0.4, 0.4, 0.4), constraint_axis=(False, False, False), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1)
+
+    bpy.ops.mesh.extrude_region_move(MESH_OT_extrude_region={"mirror":False}, TRANSFORM_OT_translate={"value":(0, 0, 0), "constraint_axis":(False, False, False), "constraint_orientation":'GLOBAL', "mirror":False, "proportional":'DISABLED', "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False})
+
+    bpy.ops.transform.resize(value=(0, 0, 0), constraint_axis=(False, False, False), constraint_orientation='GLOBAL', mirror=False, proportional='DISABLED', proportional_edit_falloff='SMOOTH', proportional_size=1)
+
+    bpy.context.space_data.pivot_point = 'MEDIAN_POINT'
+
+
+    bpy.ops.view3d.snap_cursor_to_selected()
+    
+    
+    bpy.ops.object.mode_set(mode = 'OBJECT')
+
+    bpy.context.object.name = "CorteManualInf"
+
+
+    bpy.ops.mesh.separate(type='LOOSE')
+    
+# Joga o centro nos dentes
+
+    scene = bpy.context.scene
+    foo_objs = [obj for obj in scene.objects if fnmatch.fnmatchcase(obj.name, "CorteManualInf*")]
+    foo_objs
+
+    elemento = len(foo_objs)
+    numero = 0
+
+    while numero < elemento:
+        objNome = foo_objs[numero].name
+        objeto = bpy.data.objects[objNome]
+        objeto.select = True
+        bpy.context.scene.objects.active = objeto
+        bpy.ops.object.origin_set(type='ORIGIN_GEOMETRY')
+        numero += 1
+
+# Nomeia dentes
+
+    scene = bpy.context.scene
+    foo_objs = [obj for obj in scene.objects if fnmatch.fnmatchcase(obj.name, "CorteManualInf*")]
+    foo_objs
+
+    elemento = len(foo_objs)
+    numero = 0
+
+    menosX ={}
+    maisX = {}
+    menosXordenada = {}
+    maisXordenada = {}
+
+
+    while numero < elemento:
+        coordenadaX = foo_objs[numero].location[0]
+        if coordenadaX < 0:
+            menosX[foo_objs[numero].name] = foo_objs[numero].location[0]
+            menosXordenada = sorted(menosX.items(), key=operator.itemgetter(1), reverse=True)
+
+
+        if coordenadaX > 0:
+            maisX[foo_objs[numero].name] = foo_objs[numero].location[0]
+            maisXordenada = sorted(maisX.items(), key=operator.itemgetter(1))
+
+        numero += 1
+
+    print(menosXordenada)
+    print("------------")
+    print(maisXordenada)
+
+    print(type(menosXordenada))
+    print(type(maisXordenada))
+
+    numMenos = 0
+    lenMenos = len(menosXordenada)
+    nomeMenos = 41
+
+    while numMenos < lenMenos:
+        objDenteMenos = menosXordenada[numMenos][0]
+        bpy.ops.object.select_all(action='DESELECT')
+        a = bpy.data.objects[objDenteMenos]
+        bpy.context.scene.objects.active = a
+        bpy.context.object.name = str(nomeMenos)
+
+        
+        numMenos += 1
+        nomeMenos += 1
+        
+    numMais = 0
+    lenMais = len(maisXordenada)
+    nomeMais = 31
+
+    while numMais < lenMais:
+        objDenteMais = maisXordenada[numMais][0]
+        bpy.ops.object.select_all(action='DESELECT')
+        a = bpy.data.objects[objDenteMais]
+        bpy.context.scene.objects.active = a
+        bpy.context.object.name = str(nomeMais)
+        
+        numMais += 1
+        nomeMais += 1
+
+class LiberPreparaDenteManInf(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_manual_inferior"
+    bl_label = "Prepara Dentes Manuais Inferiores"
+    
+    def execute(self, context):
+        LiberPreparaDenteManInfDef(self, context)
+        return {'FINISHED'}
 
 
 class liberBotoesArcada(bpy.types.Panel):
@@ -924,9 +1239,24 @@ class liberBotoesArcada(bpy.types.Panel):
         row = layout.row()
         row.label(text="Configuração Manual:")
 
+        row = layout.row()
+        row.operator("gpencil.draw", icon='LINE_DATA', text="Desenha Corte").mode = 'DRAW_POLY'
 
         row = layout.row()
-        row.operator("cut_mesh.polytrim", text="Desenha Cortes", icon="OUTLINER_DATA_MESH")
+        row.operator("object.liber_corta_desenho", text="Corta Desenho", icon="MOD_BOOLEAN")  
+
+        row = layout.row()
+        row.label(text=" ")
+
+        row = layout.row()
+        row.operator("object.liber_manual_superior", text="Prepara Dentes Man. Superior", icon="TRIA_UP")
+        
+        row = layout.row()
+        row.operator("object.liber_manual_inferior", text="Prepara Dentes Man. Inferior", icon="TRIA_DOWN")
+
+
+#        row = layout.row()
+#        row.operator("cut_mesh.polytrim", text="Desenha Cortes", icon="OUTLINER_DATA_MESH")
 
 
         row = layout.row()
@@ -962,6 +1292,9 @@ def register():
     bpy.utils.register_class(arcadaCortaSup)
     bpy.utils.register_class(arcadaCortaInf)
     bpy.utils.register_class(liberCriaFotogrametria)
+    bpy.utils.register_class(LiberCortaDesenho)
+    bpy.utils.register_class(LiberPreparaDenteManSup)
+    bpy.utils.register_class(LiberPreparaDenteManInf)
     bpy.utils.register_class(liberBotoesArcada)
 
     
@@ -976,6 +1309,9 @@ def unregister():
     bpy.utils.unregister_class(liberGeraModeloFoto)
     bpy.utils.unregister_class(arcadaCorta)
     bpy.utils.unregister_class(liberCriaFotogrametria)
+    bpy.utils.unregister_class(LiberCortaDesenho)
+    bpy.utils.unregister_class(LiberPreparaDenteManSup)
+    bpy.utils.unregister_class(LiberPreparaDenteManInf)
     bpy.utils.unregister_class(liberBotoesArcada)
         
 if __name__ == "__main__":
