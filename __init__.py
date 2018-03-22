@@ -21,6 +21,30 @@ import shutil
 import subprocess
 from math import sqrt
 
+def LiberArrumaCenaDef(self, context):
+
+    context = bpy.context
+
+    bpy.context.tool_settings.gpencil_stroke_placement_view3d = 'SURFACE'
+
+    bpy.data.screens['Default'].areas[4].spaces[0].fx_settings.use_ssao = True
+    bpy.data.screens['Default'].areas[4].spaces[0].fx_settings.ssao.factor = 7
+
+    bpy.context.scene.frame_end = 100
+
+    bpy.context.space_data.show_floor = False
+    bpy.context.space_data.show_axis_x = False
+    bpy.context.space_data.show_axis_y = False
+
+
+class LiberArrumaCena(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_arruma_cena"
+    bl_label = "Arruma Cena"
+    
+    def execute(self, context):
+        LiberArrumaCenaDef(self, context)
+        return {'FINISHED'}
 
 def liberGeraModelosTomoArcDef(self, context):
     
@@ -815,7 +839,15 @@ class liberCriaFotogrametria(bpy.types.Panel):
         layout = self.layout
         scn = context.scene
         obj = context.object 
-        
+
+        row = layout.row()
+        row.label(text="Configurações de Cena:")
+
+        row = layout.row()
+        knife=row.operator("object.liber_arruma_cena", text="ARRUMA CENA!", icon="PARTICLES") 
+
+        row = layout.row()
+        row.label(text=" ")        
 
         row = layout.row()
         row.label(text="Digitalização Feita Por Scanner:")
@@ -870,6 +902,7 @@ class liberCriaFotogrametria(bpy.types.Panel):
 
 
 # CORTA DESENHO
+
 
 def LiberCortaDesenhoDef(self, context):
 
@@ -1200,7 +1233,6 @@ class liberBotoesArcada(bpy.types.Panel):
 
         obj = context.object
 
-
         row = layout.row()
         row.label(text="Segmenta Área de Interesse:")
 
@@ -1211,6 +1243,7 @@ class liberBotoesArcada(bpy.types.Panel):
         circle.vertices=100
         circle.location=(0,0,0)
         circle.rotation=(1.5708,0,0)
+
 
         row = layout.row()
         knife=row.operator("object.corta_face", text="Cortar!", icon="META_PLANE")
@@ -1282,6 +1315,7 @@ class liberBotoesArcada(bpy.types.Panel):
         
     
 def register():
+    bpy.utils.register_class(LiberArrumaCena)
     bpy.utils.register_class(liberGeraModelosTomoArc)
     bpy.utils.register_class(ImportaCorte)
     bpy.utils.register_class(AlinhaArcada2)
@@ -1299,6 +1333,7 @@ def register():
 
     
 def unregister():
+    bpy.utils.unregister_class(LiberArrumaCena)
     bpy.utils.unregister_class(liberGeraModelosTomoArc)
     bpy.utils.unregister_class(ImportaCorteSup)
     bpy.utils.register_class(arcadaCortaInf)
