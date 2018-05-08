@@ -1,7 +1,7 @@
 bl_info = {
     "name": "LiberTeeth3D",
     "author": "Cicero Moraes e Graziane Olimpio",
-    "version": (1, 0, 1),
+    "version": (1, 0, 4),
     "blender": (2, 75, 0),
     "location": "View3D",
     "description": "Ortodontia no Blender",
@@ -357,12 +357,8 @@ def liberGeraModeloFotoDef(self, context):
             OpenMVSPath = 'C:/OrtogOnBlender/openMVSWin/OpenMVSarcada.bat' 
 
         if platform.system() == "Darwin":
-            if platform.release() == '15.6.0':
-                OpenMVGPath = '/OrtogOnBlender/openMVGMACelcap/SfM_SequentialPipeline.py'
-                OpenMVSPath = '/OrtogOnBlender/openMVSMACelcap/openMVSarcadaMAC.sh'            
-        else:
-            OpenMVGPath = '/OrtogOnBlender/openMVGMAC/SfM_SequentialPipeline.py' 
-            OpenMVSPath = '/OrtogOnBlender/openMVSMAC/openMVSarcadaMAC.sh'
+            OpenMVGPath = '/OrtogOnBlender/openMVGMACelcap/SfM_SequentialPipeline.py'
+            OpenMVSPath = '/OrtogOnBlender/openMVSMACelcap/openMVSarcadaMAC.sh'            
 
 
         shutil.rmtree(tmpdir+'/OpenMVG', ignore_errors=True)
