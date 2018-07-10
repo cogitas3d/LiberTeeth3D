@@ -1,7 +1,7 @@
 bl_info = {
     "name": "LiberTeeth3D",
     "author": "Cicero Moraes e Graziane Olimpio",
-    "version": (1, 0, 4),
+    "version": (1, 0, 0),
     "blender": (2, 75, 0),
     "location": "View3D",
     "description": "Ortodontia no Blender",
@@ -20,6 +20,7 @@ import platform
 import shutil
 import subprocess
 from math import sqrt
+import bmesh
 
 def LiberArrumaCenaDef(self, context):
 
@@ -46,6 +47,73 @@ class LiberArrumaCena(bpy.types.Operator):
         LiberArrumaCenaDef(self, context)
         return {'FINISHED'}
 
+def liberGeraModelosTomoArcDef(self, context):
+    
+    scn = context.scene
+    
+    tmpdir = tempfile.gettempdir()
+    tmpSTLarcada = tmpdir+'/Arcada.stl'
+
+    homeall = expanduser("~")
+
+    try:
+
+
+        if platform.system() == "Linux":
+
+
+            dicom2DtlPath = homeall+'/Programs/OrtogOnBlender/Dicom2Mesh/dicom2mesh'
+#            dicom2DtlPath = get_dicom2stl_filepath(context)
+
+
+            subprocess.call([dicom2DtlPath, '-i',  scn.my_tool.path, '-r', '0.5', '-s', '-t', '226', '-o', tmpSTLarcada])
+	      
+
+            bpy.ops.import_mesh.stl(filepath=tmpSTLarcada, filter_glob="*.stl",  files=[{"name":"Arcada.stl", "name":"Arcada.stl"}], directory=tmpdir)
+      
+
+
+        if platform.system() == "Windows":
+
+            dicom2DtlPath = 'C:/OrtogOnBlender/DicomToMeshWin/dicom2mesh.exe'
+
+
+            subprocess.call([dicom2DtlPath, '-i',  scn.my_tool.path, '-r', '0.5', '-s', '-t', '226', '-o', tmpSTLarcada])
+	      
+
+            bpy.ops.import_mesh.stl(filepath=tmpSTLarcada, filter_glob="*.stl",  files=[{"name":"Arcada.stl", "name":"Arcada.stl"}], directory=tmpdir)
+
+
+        if platform.system() == "Darwin":
+
+
+            dicom2DtlPath = homeall+'/OrtogOnBlender/DicomToMeshMAC/dicom2mesh'
+
+#            dicom2DtlPath = get_dicom2stl_filepath(context)
+
+
+            subprocess.call([dicom2DtlPath, '-i',  scn.my_tool.path, '-r', '0.5', '-s', '-t', '226', '-o', tmpSTLarcada])
+	      
+
+            bpy.ops.import_mesh.stl(filepath=tmpSTLarcada, filter_glob="*.stl",  files=[{"name":"Arcada.stl", "name":"Arcada.stl"}], directory=tmpdir)
+
+  
+        bpy.ops.object.origin_set(type='GEOMETRY_ORIGIN')
+        bpy.ops.view3d.view_all(center=False)
+
+    except RuntimeError:
+        bpy.context.window_manager.popup_menu(ERROruntimeDICOMDef, title="Atenção!", icon='INFO')
+
+
+class liberGeraModelosTomoArc(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.gera_modelos_tomo_arc"
+    bl_label = "Prepara Impressao"
+    
+    def execute(self, context):
+        liberGeraModelosTomoArcDef(self, context)
+        return {'FINISHED'}
+
 
 # IMPORTA CORTE
 
@@ -60,8 +128,7 @@ def ImportaCorteDef(self, context):
         
         blendfile = dirScript+"addons/LiberTeeth3D-master/objetos.blend"
         section   = "\\Group\\"
-        object    = "ArcadaCorta"        
-        
+        object    = "ArcadaCorta"
         
     if platform.system() == "Windows":
         dirScript = 'C:/OrtogOnBlender/Blender/2.78/scripts/' 
@@ -357,8 +424,8 @@ def liberGeraModeloFotoDef(self, context):
             OpenMVSPath = 'C:/OrtogOnBlender/openMVSWin/OpenMVSarcada.bat' 
 
         if platform.system() == "Darwin":
-            OpenMVGPath = '/OrtogOnBlender/openMVGMACelcap/SfM_SequentialPipeline.py'
-            OpenMVSPath = '/OrtogOnBlender/openMVSMACelcap/openMVSarcadaMAC.sh'            
+            OpenMVGPath = homeall+'/OrtogOnBlender/openMVGMAC/SfM_SequentialPipeline.py' 
+            OpenMVSPath = homeall+'/OrtogOnBlender/openMVSMAC/openMVSarcadaMAC.sh'
 
 
         shutil.rmtree(tmpdir+'/OpenMVG', ignore_errors=True)
@@ -863,6 +930,58 @@ class LiberCortaDesenho(bpy.types.Operator):
         LiberCortaDesenhoDef(self, context)
         return {'FINISHED'}
 
+
+# CORTA DESENHO FORA
+
+
+def LiberCortaDesenhoForaDef(self, context):
+
+    context = bpy.context
+    obj = context.active_object
+    scn = context.scene
+
+    bpy.ops.gpencil.convert(type='POLY')
+    bpy.ops.gpencil.layer_remove()
+#    bpy.ops.object.editmode_toggle()
+    bpy.ops.object.mode_set(mode='EDIT')
+#    bpy.ops.object.editmode_toggle()
+    mesh=bmesh.from_edit_mesh(bpy.context.object.data)
+#    for v in mesh.verts:
+    for v in mesh.verts and mesh.faces:
+        #print(v)
+        v.select = True
+#        v.select = True
+    bpy.context.scene.objects.active = bpy.context.scene.objects.active # Atualiza viewport
+   
+    bpy.ops.mesh.flip_normals() # Inverter para funcionar o Knife fora a fora
+    bpy.ops.mesh.select_all(action = 'DESELECT')
+
+    bpy.ops.mesh.select_mode(type='FACE')
+    bpy.ops.mesh.knife_project(cut_through=True) # CUIDADO! Seleciona apenas a parte de trás
+    bpy.context.scene.objects.active = bpy.context.scene.objects.active
+    bpy.ops.mesh.select_all(action='INVERT')
+    bpy.ops.mesh.delete(type='FACE')
+    bpy.ops.mesh.select_all(action = 'SELECT')
+    bpy.ops.mesh.flip_normals()
+    bpy.ops.object.editmode_toggle()
+
+
+    bpy.ops.object.select_all(action='DESELECT')
+    a = bpy.data.objects['GP_Layer']
+    a.select = True
+    bpy.context.scene.objects.active = a
+    bpy.ops.object.delete(use_global=False)
+
+
+class LiberCortaDesenhoFora(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_corta_desenho_fora"
+    bl_label = "Desenha Corte Fora"
+    
+    def execute(self, context):
+        LiberCortaDesenhoForaDef(self, context)
+        return {'FINISHED'}
+
 # PREPARA DENTES MANUAL SUPERIOR
 
 def LiberPreparaDenteManSupDef(self, context):
@@ -1210,7 +1329,10 @@ class liberBotoesArcada(bpy.types.Panel):
         row.operator("gpencil.draw", icon='LINE_DATA', text="Desenha Corte").mode = 'DRAW_POLY'
 
         row = layout.row()
-        row.operator("object.liber_corta_desenho", text="Corta Desenho", icon="MOD_BOOLEAN")  
+        row.operator("object.liber_corta_desenho", text="Corta Desenho Dentro", icon="MOD_BOOLEAN")  
+
+        row = layout.row()
+        row.operator("object.liber_corta_desenho_fora", text="Corta Desenho Fora", icon="MOD_BOOLEAN")  
 
         row = layout.row()
         row.label(text=" ")
@@ -1250,6 +1372,7 @@ class liberBotoesArcada(bpy.types.Panel):
     
 def register():
     bpy.utils.register_class(LiberArrumaCena)
+    bpy.utils.register_class(liberGeraModelosTomoArc)
     bpy.utils.register_class(ImportaCorte)
     bpy.utils.register_class(AlinhaArcada2)
     bpy.utils.register_class(ImportaAlinhaArcada)
@@ -1260,6 +1383,7 @@ def register():
     bpy.utils.register_class(arcadaCortaInf)
     bpy.utils.register_class(liberCriaFotogrametria)
     bpy.utils.register_class(LiberCortaDesenho)
+    bpy.utils.register_class(LiberCortaDesenhoFora)
     bpy.utils.register_class(LiberPreparaDenteManSup)
     bpy.utils.register_class(LiberPreparaDenteManInf)
     bpy.utils.register_class(liberBotoesArcada)
@@ -1267,6 +1391,7 @@ def register():
     
 def unregister():
     bpy.utils.unregister_class(LiberArrumaCena)
+    bpy.utils.unregister_class(liberGeraModelosTomoArc)
     bpy.utils.unregister_class(ImportaCorteSup)
     bpy.utils.register_class(arcadaCortaInf)
     bpy.utils.unregister_class(AlinhaArcada2)
@@ -1277,6 +1402,7 @@ def unregister():
     bpy.utils.unregister_class(arcadaCorta)
     bpy.utils.unregister_class(liberCriaFotogrametria)
     bpy.utils.unregister_class(LiberCortaDesenho)
+    bpy.utils.unregister_class(LiberCortaDesenhoFora)
     bpy.utils.unregister_class(LiberPreparaDenteManSup)
     bpy.utils.unregister_class(LiberPreparaDenteManInf)
     bpy.utils.unregister_class(liberBotoesArcada)
