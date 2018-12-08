@@ -20,7 +20,6 @@ import platform
 import shutil
 import subprocess
 from math import sqrt
-import bmesh
 
 def LiberArrumaCenaDef(self, context):
 
@@ -829,7 +828,7 @@ class arcadaCortaInf(bpy.types.Operator):
 
 class liberCriaFotogrametria(bpy.types.Panel):
     """Planejamento de cirurgia ortognática no Blender"""
-    bl_label = "Gera/Importa Arcadas"
+    bl_label = "Generate/Import Archs"
     bl_idname = "liber_cria_fotogrametria"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
@@ -842,61 +841,45 @@ class liberCriaFotogrametria(bpy.types.Panel):
         obj = context.object 
 
         row = layout.row()
-        row.label(text="Configurações de Cena:")
+        row.label(text="Scene Setup:")
 
         row = layout.row()
-        knife=row.operator("object.liber_arruma_cena", text="ARRUMA CENA!", icon="PARTICLES") 
+        knife=row.operator("object.liber_arruma_cena", text="Fix scene!", icon="PARTICLES") 
 
         row = layout.row()
-        row.label(text=" ")        
+        row.label(text="3D Scanning:")
 
         row = layout.row()
-        row.label(text="Digitalização Feita Por Scanner:")
+        row.operator("import_mesh.stl", text="Import STL", icon="IMPORT")
 
         row = layout.row()
-        row.operator("import_mesh.stl", text="Importa STL", icon="IMPORT")
-
-
-        row = layout.row()
-        row.label(text=" ")
-
-        row = layout.row()
-        row.label(text="Digitalização por Fotos:")
+        row.label(text="Scanning by Photogrammetry:")
 
         col = layout.column(align=True)
         col.prop(scn.my_tool, "path", text="")
  
         row = layout.row()
-        row.operator("object.liber_gera_modelo_foto", text="Iniciar Fotogrametria", icon="IMAGE_DATA")
-
-        row = layout.row()
-        row.label(text=" ")
+        row.operator("object.liber_gera_modelo_foto", text="Start Photogrammetry!", icon="IMAGE_DATA")
 
         row = layout.row()        
-        row.label(text="Alinhamento e Redimensionamento:")
-        layout.operator("object.alinha_rosto", text="1 - Alinha com a Camera", icon="MANIPUL")
+        row.label(text="Align and Resize:")
+        layout.operator("object.alinha_rosto", text="1 - Align with the Camera", icon="MANIPUL")
         col = self.layout.column(align = True)
-        col.prop(context.scene, "medida_real")
+        col.prop(context.scene, "medida_real")  
+        layout.operator("object.alinha_rosto2", text="3 - Align and resize", icon="LAMP_POINT")
         
-        layout.operator("object.alinha_arcada2", text="2 - Alinha e Redimensiona", icon="LAMP_POINT")
-        
-#        row = layout.row()
-#        row.operator("object.liber_rotaciona_y", text="Rotaciona Y", icon="FORCE_MAGNETIC")
         
         row = layout.row()
         row.operator("object.liber_flip_y", text="Flip Y", icon="FILE_REFRESH")
 
         row = layout.row()
-        row.label(text=" ")
-
-        row = layout.row()
-        row.label(text="Reconstrução da Tomografia:")
+        row.label(text="CT-Scan Reconstruction:")
 
         col = layout.column(align=True)
         col.prop(scn.my_tool, "path", text="")
  
         row = layout.row()
-        row.operator("object.gera_modelos_tomo_arc", text="Gera Arcada", icon="SNAP_FACE")
+        row.operator("object.gera_modelos_tomo_arc", text="Arch Generator", icon="SNAP_FACE")
 
 #        col = layout.column(align=True)
 #        col.prop(scn.my_tool, "path", text="")
@@ -928,58 +911,6 @@ class LiberCortaDesenho(bpy.types.Operator):
     
     def execute(self, context):
         LiberCortaDesenhoDef(self, context)
-        return {'FINISHED'}
-
-
-# CORTA DESENHO FORA
-
-
-def LiberCortaDesenhoForaDef(self, context):
-
-    context = bpy.context
-    obj = context.active_object
-    scn = context.scene
-
-    bpy.ops.gpencil.convert(type='POLY')
-    bpy.ops.gpencil.layer_remove()
-#    bpy.ops.object.editmode_toggle()
-    bpy.ops.object.mode_set(mode='EDIT')
-#    bpy.ops.object.editmode_toggle()
-    mesh=bmesh.from_edit_mesh(bpy.context.object.data)
-#    for v in mesh.verts:
-    for v in mesh.verts and mesh.faces:
-        #print(v)
-        v.select = True
-#        v.select = True
-    bpy.context.scene.objects.active = bpy.context.scene.objects.active # Atualiza viewport
-   
-    bpy.ops.mesh.flip_normals() # Inverter para funcionar o Knife fora a fora
-    bpy.ops.mesh.select_all(action = 'DESELECT')
-
-    bpy.ops.mesh.select_mode(type='FACE')
-    bpy.ops.mesh.knife_project(cut_through=True) # CUIDADO! Seleciona apenas a parte de trás
-    bpy.context.scene.objects.active = bpy.context.scene.objects.active
-    bpy.ops.mesh.select_all(action='INVERT')
-    bpy.ops.mesh.delete(type='FACE')
-    bpy.ops.mesh.select_all(action = 'SELECT')
-    bpy.ops.mesh.flip_normals()
-    bpy.ops.object.editmode_toggle()
-
-
-    bpy.ops.object.select_all(action='DESELECT')
-    a = bpy.data.objects['GP_Layer']
-    a.select = True
-    bpy.context.scene.objects.active = a
-    bpy.ops.object.delete(use_global=False)
-
-
-class LiberCortaDesenhoFora(bpy.types.Operator):
-    """Tooltip"""
-    bl_idname = "object.liber_corta_desenho_fora"
-    bl_label = "Desenha Corte Fora"
-    
-    def execute(self, context):
-        LiberCortaDesenhoForaDef(self, context)
         return {'FINISHED'}
 
 # PREPARA DENTES MANUAL SUPERIOR
@@ -1275,7 +1206,7 @@ class LiberPreparaDenteManInf(bpy.types.Operator):
 
 class liberBotoesArcada(bpy.types.Panel):
     """LiberTeeth 3D"""
-    bl_label = "Configura Arcada"
+    bl_label = "Archs Setup"
     bl_idname = "liber_configura_arcada"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
@@ -1287,87 +1218,65 @@ class liberBotoesArcada(bpy.types.Panel):
         obj = context.object
 
         row = layout.row()
-        row.label(text="Segmenta Área de Interesse:")
+        row.label(text="Interest Area Segmentation:")
+
+        row = layout.row()
+        row.operator("cut_mesh.polytrim", text="Draw Line Cut", icon="OUTLINER_DATA_MESH")
+
+        row = layout.row()
+        row.operator("object.cria_circulo_corte", text="Cutting circle", icon="MESH_CIRCLE")
 
 
         row = layout.row()
-        circle=row.operator("mesh.primitive_circle_add", text="Círculo de Corte", icon="MESH_CIRCLE")
-        circle.radius=52.5
-        circle.vertices=100
-        circle.location=(0,0,0)
-        circle.rotation=(1.5708,0,0)
+        knife=row.operator("object.corta_face", text="Cut!", icon="META_PLANE")
 
 
         row = layout.row()
-        knife=row.operator("object.corta_face", text="Cortar!", icon="META_PLANE")
+        row.operator("object.importa_arcada_corte", text="Cut Plane Add", icon="BORDER_LASSO")
 
         row = layout.row()
-        row.label(text=" ")
+        row.label(text="Arch Setup:")
 
         row = layout.row()
-        row.operator("object.importa_arcada_corte", text="Adiciona Plano de Corte", icon="BORDER_LASSO")
+        row.operator("object.arcada_corta_sup", text="Setup Upper Arch", icon="TRIA_UP")
 
         row = layout.row()
-        row.label(text=" ")
+        row.operator("object.arcada_corta_inf", text="Setup Lower Arch", icon="TRIA_DOWN")
 
         row = layout.row()
-        row.label(text="Configuração das Arcadas:")
+        row.label(text="Manual Setup:")
 
         row = layout.row()
-        row.operator("object.arcada_corta_sup", text="Configura Arcada Superior", icon="TRIA_UP")
+        row.operator("gpencil.draw", icon='LINE_DATA', text="Draw Cut").mode = 'DRAW_POLY'
 
         row = layout.row()
-        row.operator("object.arcada_corta_inf", text="Configura Arcada Inferior", icon="TRIA_DOWN")
+        row.operator("object.liber_corta_desenho", text="Cut!", icon="MOD_BOOLEAN")  
 
         row = layout.row()
-        row.label(text=" ")
-
-        row = layout.row()
-        row.label(text="Configuração Manual:")
-
-        row = layout.row()
-        row.operator("gpencil.draw", icon='LINE_DATA', text="Desenha Corte").mode = 'DRAW_POLY'
-
-        row = layout.row()
-        row.operator("object.liber_corta_desenho", text="Corta Desenho Dentro", icon="MOD_BOOLEAN")  
-
-        row = layout.row()
-        row.operator("object.liber_corta_desenho_fora", text="Corta Desenho Fora", icon="MOD_BOOLEAN")  
-
-        row = layout.row()
-        row.label(text=" ")
-
-        row = layout.row()
-        row.operator("object.liber_manual_superior", text="Prepara Dentes Man. Superior", icon="TRIA_UP")
+        row.operator("object.liber_manual_superior", text="Setup Upper Teeth", icon="TRIA_UP")
         
         row = layout.row()
-        row.operator("object.liber_manual_inferior", text="Prepara Dentes Man. Inferior", icon="TRIA_DOWN")
+        row.operator("object.liber_manual_inferior", text="Setup Lower Teeth", icon="TRIA_DOWN")
 
 
 #        row = layout.row()
 #        row.operator("cut_mesh.polytrim", text="Desenha Cortes", icon="OUTLINER_DATA_MESH")
 
+        row = layout.row()
+        row.label(text="Teeth Setup:")
 
         row = layout.row()
-        row.label(text=" ")
+        row.operator("object.importa_alinha_arcada", text="Align References", icon="CURVE_PATH")
 
         row = layout.row()
-        row.label(text="Setup dos Dentes:")
+        row.label(text="Kynematic:")
 
         row = layout.row()
-        row.operator("object.importa_alinha_arcada", text="Referências de Alinhamento", icon="CURVE_PATH")
-        
-        row = layout.row()
-        row.label(text=" ")
-
-        row = layout.row()
-        row.label(text="Dinâmica dos Dentes:")
-        row = layout.row()
-        row.operator("screen.frame_jump", text="Inicio", icon="REW").end=False
+        row.operator("screen.frame_jump", text="Start", icon="REW").end=False
         row.operator("screen.animation_play", text="", icon="PLAY_REVERSE").reverse=True
         row.operator("anim.animalocrot", text="", icon="CLIP")
         row.operator("screen.animation_play", text="", icon="PLAY")
-        row.operator("screen.frame_jump", text="Final", icon="FF").end=True        
+        row.operator("screen.frame_jump", text="End", icon="FF").end=True     
         
     
 def register():
@@ -1383,7 +1292,6 @@ def register():
     bpy.utils.register_class(arcadaCortaInf)
     bpy.utils.register_class(liberCriaFotogrametria)
     bpy.utils.register_class(LiberCortaDesenho)
-    bpy.utils.register_class(LiberCortaDesenhoFora)
     bpy.utils.register_class(LiberPreparaDenteManSup)
     bpy.utils.register_class(LiberPreparaDenteManInf)
     bpy.utils.register_class(liberBotoesArcada)
@@ -1402,7 +1310,6 @@ def unregister():
     bpy.utils.unregister_class(arcadaCorta)
     bpy.utils.unregister_class(liberCriaFotogrametria)
     bpy.utils.unregister_class(LiberCortaDesenho)
-    bpy.utils.unregister_class(LiberCortaDesenhoFora)
     bpy.utils.unregister_class(LiberPreparaDenteManSup)
     bpy.utils.unregister_class(LiberPreparaDenteManInf)
     bpy.utils.unregister_class(liberBotoesArcada)
