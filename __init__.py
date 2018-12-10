@@ -1257,6 +1257,15 @@ class liberBotoesArcada(bpy.types.Panel):
         row.operator("mesh.fill_grid", text="Grid Fill", icon="MESH_GRID")#.span=1
         #mesh.fill_grid(span=1)
 
+        row = layout.row()
+        circle=row.operator("view3d.cork_mesh_slicer", text="Boolean Union", icon="MOD_ARRAY")
+        circle.method='UNION'
+
+        row = layout.row()
+        row.operator("object.prepara_impressao", text="Prepares 3D Printing", icon="MOD_REMESH")
+
+        row = layout.row()
+        row.label(text="Teeth Setup:")
 
         row = layout.row()
         row.operator("object.liber_manual_superior", text="Setup Upper Teeth", icon="TRIA_UP")
@@ -1267,9 +1276,6 @@ class liberBotoesArcada(bpy.types.Panel):
 
 #        row = layout.row()
 #        row.operator("cut_mesh.polytrim", text="Desenha Cortes", icon="OUTLINER_DATA_MESH")
-
-        row = layout.row()
-        row.label(text="Teeth Setup:")
 
         row = layout.row()
         row.operator("object.importa_alinha_arcada", text="Align References", icon="CURVE_PATH")
