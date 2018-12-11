@@ -1250,8 +1250,10 @@ class liberBotoesArcada(bpy.types.Panel):
         row.operator("gpencil.draw", icon='LINE_DATA', text="Draw Cut").mode = 'DRAW_POLY'
 
         row = layout.row()
-        row.operator("object.liber_corta_desenho", text="Cut!", icon="MOD_BOOLEAN")
+        linha=row.operator("object.segmenta_desenho", text="Cut All!", icon="FCURVE")
 
+        row = layout.row()
+        row.operator("object.liber_corta_desenho", text="Cut Front!", icon="MOD_BOOLEAN")
 
         row = layout.row()
         row.operator("mesh.fill_grid", text="Grid Fill", icon="MESH_GRID")#.span=1
