@@ -44,7 +44,7 @@ del master.zip""")
 		arquivo.writelines("""cd $HOME/Downloads && rm -Rfv LiberTeeth3D-master* && \
 if [ -f "master.zip" ]; then echo "tem arquivo" && rm master.zi*; fi && \
 wget https://github.com/cogitas3d/LiberTeeth3D/archive/master.zip && \
-rm -Rfv $HOME/.config/blender/2.78/scripts/addons/OrtogOnBlender-master && \
+rm -Rfv $HOME/.config/blender/2.78/scripts/addons/LiberTeeth3D-master && \
 unzip master.zip && \
 cp -Rv LiberTeeth3D-master $HOME/.config/blender/2.78/scripts/addons/""")
 
