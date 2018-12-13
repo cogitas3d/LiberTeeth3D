@@ -21,6 +21,62 @@ import shutil
 import subprocess
 from math import sqrt
 
+# ATUALIACAO DO SCRIPT
+
+def LiberAtualizaScriptDef(self, context):
+
+	if platform.system() == "Windows":
+
+		arquivo = open('atualiza_liber.bat', 'w+')
+		arquivo.writelines("""cd C:\OrtogOnBlender\Blender\2.78\scripts\addons && ^
+rd /s /q LiberTeeth3D-master && ^
+C:\OrtogOnBlender\Python27\python.exe -c "import urllib; urllib.urlretrieve ('https://github.com/cogitas3d/LiberTeeth3D/archive/master.zip', 'master.zip')" && ^
+C:\OrtogOnBlender\7-Zip\7z x  master.zip && ^
+del master.zip""")
+
+		arquivo.close()
+
+		subprocess.call('atualiza_liber.bat', shell=True)
+
+	if platform.system() == "Linux":
+
+		arquivo = open('Programs/OrtogOnBlender/atualiza_liber.sh', 'w+')
+		arquivo.writelines("""cd $HOME/Downloads && rm -Rfv LiberTeeth3D-master* && \
+if [ -f "master.zip" ]; then echo "tem arquivo" && rm master.zi*; fi && \
+wget https://github.com/cogitas3d/LiberTeeth3D/archive/master.zip && \
+rm -Rfv $HOME/.config/blender/2.78/scripts/addons/OrtogOnBlender-master && \
+unzip master.zip && \
+cp -Rv LiberTeeth3D-master $HOME/.config/blender/2.78/scripts/addons/""")
+
+		arquivo.close()
+
+		subprocess.call('chmod +x Programs/OrtogOnBlender/atualiza_liber.sh && Programs/OrtogOnBlender/atualiza_liber.sh', shell=True)
+        
+
+	if platform.system() == "Darwin":
+
+		arquivo = open('atualiza_liber.sh', 'w+')
+		arquivo.writelines("""cd $HOME/Downloads && rm -Rfv LiberTeeth3D-master* && \
+if [ -f "master.zip" ]; then echo "tem arquivo" && rm master.zi*; fi && \
+wget https://github.com/cogitas3d/LiberTeeth3D/archive/master.zip && \
+rm -Rfv $HOME/Library/Application\ Support/Blender/2.78/scripts/addons/LiberTeeth3D-master && \
+unzip master.zip && \
+mv LiberTeeth3D-master $HOME/Library/Application\ Support/Blender/2.78/scripts/addons/""")
+
+		arquivo.close()
+
+		subprocess.call('chmod +x atualiza_liber.sh && ./atualiza_liber.sh', shell=True)
+
+class LiberAtualizaScript(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_atualiza_script"
+    bl_label = "Atualiza Script"
+
+    def execute(self, context):
+        LiberAtualizaScriptDef(self, context)
+        return {'FINISHED'}
+
+
 def LiberArrumaCenaDef(self, context):
 
     context = bpy.context
@@ -1203,6 +1259,29 @@ class LiberPreparaDenteManInf(bpy.types.Operator):
         LiberPreparaDenteManInfDef(self, context)
         return {'FINISHED'}
 
+#ATUALIZA VERSAO
+class LiberPainelAtualiza(bpy.types.Panel):
+    """Planejamento de Ortodontia no Blender"""
+    bl_label = "Upgrade RhinOnBlender"
+    bl_idname = "liber_atualiza"
+    bl_space_type = 'VIEW_3D'
+    bl_region_type = 'TOOLS'
+    bl_category = "Liber"
+
+    def draw(self, context):
+        layout = self.layout
+        scn = context.scene
+        obj = context.object 
+		
+        row = layout.row()
+        row.label(text="VERSION: 20181213")
+
+        row = layout.row()
+        row.operator("object.liber_atualiza_script", text="UPGRADE LIBER!", icon="RECOVER_LAST")
+		
+        if platform.system() == "Windows":
+            row = layout.row()
+            row.operator("wm.console_toggle", text="Open Terminal?", icon="CONSOLE")
 
 class liberBotoesArcada(bpy.types.Panel):
     """LiberTeeth 3D"""
@@ -1294,6 +1373,7 @@ class liberBotoesArcada(bpy.types.Panel):
         
     
 def register():
+    bpy.utils.register_class(LiberAtualizaScript)
     bpy.utils.register_class(LiberArrumaCena)
     bpy.utils.register_class(liberGeraModelosTomoArc)
     bpy.utils.register_class(ImportaCorte)
@@ -1304,6 +1384,7 @@ def register():
     bpy.utils.register_class(liberGeraModeloFoto)
     bpy.utils.register_class(arcadaCortaSup)
     bpy.utils.register_class(arcadaCortaInf)
+    bpy.utils.register_class(LiberPainelAtualiza)
     bpy.utils.register_class(liberCriaFotogrametria)
     bpy.utils.register_class(LiberCortaDesenho)
     bpy.utils.register_class(LiberPreparaDenteManSup)
@@ -1312,6 +1393,7 @@ def register():
 
     
 def unregister():
+    bpy.utils.unregister_class(LiberAtualizaScript)
     bpy.utils.unregister_class(LiberArrumaCena)
     bpy.utils.unregister_class(liberGeraModelosTomoArc)
     bpy.utils.unregister_class(ImportaCorteSup)
@@ -1322,6 +1404,7 @@ def unregister():
     bpy.utils.unregister_class(liberFlipY)    
     bpy.utils.unregister_class(liberGeraModeloFoto)
     bpy.utils.unregister_class(arcadaCorta)
+    bpy.utils.unregister_class(LiberPainelAtualiza)
     bpy.utils.unregister_class(liberCriaFotogrametria)
     bpy.utils.unregister_class(LiberCortaDesenho)
     bpy.utils.unregister_class(LiberPreparaDenteManSup)
