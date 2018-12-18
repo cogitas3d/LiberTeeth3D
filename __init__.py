@@ -1274,7 +1274,7 @@ class LiberPainelAtualiza(bpy.types.Panel):
         obj = context.object 
 		
         row = layout.row()
-        row.label(text="VERSION: 20181213")
+        row.label(text="VERSION: 20181218a")
 
         row = layout.row()
         row.operator("object.liber_atualiza_script", text="UPGRADE LIBER!", icon="RECOVER_LAST")
@@ -1346,7 +1346,31 @@ class liberBotoesArcada(bpy.types.Panel):
         row.operator("object.prepara_impressao", text="Prepares 3D Printing", icon="MOD_REMESH")
 
         row = layout.row()
+        row.label(text="Sculpting:")
+
+        row = layout.row()
+        row.operator("object.mode_set", text="Object Mode", icon="OBJECT_DATA").mode = 'OBJECT'
+        
+        row = layout.row()
+        row.operator("sculpt.sculptmode_toggle", text="Sculpt Mode", icon="SCULPTMODE_HLT")
+        
+        row = layout.row()
+        row.operator("object.escultura_grab", text="Grab", icon="BRUSH_GRAB")
+ 
+        row = layout.row()
+        row.operator("paint.brush_select", text="Nudge", icon="BRUSH_NUDGE").sculpt_tool='NUDGE'
+        
+        row = layout.row()
+        row.operator("paint.brush_select", text="Draw", icon="BRUSH_SCULPT_DRAW").sculpt_tool='DRAW'
+        
+        row = layout.row()
+        row.operator("paint.brush_select", text="Smooth", icon="BRUSH_SMOOTH").sculpt_tool='SMOOTH'
+
+        row = layout.row()
         row.label(text="Teeth Setup:")
+
+#        row = layout.row()
+#        row.operator("cut_mesh.polytrim", text="Desenha Cortes", icon="OUTLINER_DATA_MESH")
 
         row = layout.row()
         row.operator("object.liber_manual_superior", text="Setup Upper Teeth", icon="TRIA_UP")
@@ -1354,12 +1378,9 @@ class liberBotoesArcada(bpy.types.Panel):
         row = layout.row()
         row.operator("object.liber_manual_inferior", text="Setup Lower Teeth", icon="TRIA_DOWN")
 
-
-#        row = layout.row()
-#        row.operator("cut_mesh.polytrim", text="Desenha Cortes", icon="OUTLINER_DATA_MESH")
-
         row = layout.row()
         row.operator("object.importa_alinha_arcada", text="Align References", icon="CURVE_PATH")
+
 
         row = layout.row()
         row.label(text="Kynematic:")
