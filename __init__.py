@@ -102,73 +102,6 @@ class LiberArrumaCena(bpy.types.Operator):
         LiberArrumaCenaDef(self, context)
         return {'FINISHED'}
 
-def liberGeraModelosTomoArcDef(self, context):
-    
-    scn = context.scene
-    
-    tmpdir = tempfile.gettempdir()
-    tmpSTLarcada = tmpdir+'/Arcada.stl'
-
-    homeall = expanduser("~")
-
-    try:
-
-
-        if platform.system() == "Linux":
-
-
-            dicom2DtlPath = homeall+'/Programs/OrtogOnBlender/Dicom2Mesh/dicom2mesh'
-#            dicom2DtlPath = get_dicom2stl_filepath(context)
-
-
-            subprocess.call([dicom2DtlPath, '-i',  scn.my_tool.path, '-r', '0.5', '-s', '-t', '226', '-o', tmpSTLarcada])
-	      
-
-            bpy.ops.import_mesh.stl(filepath=tmpSTLarcada, filter_glob="*.stl",  files=[{"name":"Arcada.stl", "name":"Arcada.stl"}], directory=tmpdir)
-      
-
-
-        if platform.system() == "Windows":
-
-            dicom2DtlPath = 'C:/OrtogOnBlender/DicomToMeshWin/dicom2mesh.exe'
-
-
-            subprocess.call([dicom2DtlPath, '-i',  scn.my_tool.path, '-r', '0.5', '-s', '-t', '226', '-o', tmpSTLarcada])
-	      
-
-            bpy.ops.import_mesh.stl(filepath=tmpSTLarcada, filter_glob="*.stl",  files=[{"name":"Arcada.stl", "name":"Arcada.stl"}], directory=tmpdir)
-
-
-        if platform.system() == "Darwin":
-
-
-            dicom2DtlPath = homeall+'/OrtogOnBlender/DicomToMeshMAC/dicom2mesh'
-
-#            dicom2DtlPath = get_dicom2stl_filepath(context)
-
-
-            subprocess.call([dicom2DtlPath, '-i',  scn.my_tool.path, '-r', '0.5', '-s', '-t', '226', '-o', tmpSTLarcada])
-	      
-
-            bpy.ops.import_mesh.stl(filepath=tmpSTLarcada, filter_glob="*.stl",  files=[{"name":"Arcada.stl", "name":"Arcada.stl"}], directory=tmpdir)
-
-  
-        bpy.ops.object.origin_set(type='GEOMETRY_ORIGIN')
-        bpy.ops.view3d.view_all(center=False)
-
-    except RuntimeError:
-        bpy.context.window_manager.popup_menu(ERROruntimeDICOMDef, title="Atenção!", icon='INFO')
-
-
-class liberGeraModelosTomoArc(bpy.types.Operator):
-    """Tooltip"""
-    bl_idname = "object.gera_modelos_tomo_arc"
-    bl_label = "Prepara Impressao"
-    
-    def execute(self, context):
-        liberGeraModelosTomoArcDef(self, context)
-        return {'FINISHED'}
-
 
 # IMPORTA CORTE
 
@@ -1402,7 +1335,6 @@ class liberBotoesArcada(bpy.types.Panel):
 def register():
     bpy.utils.register_class(LiberAtualizaScript)
     bpy.utils.register_class(LiberArrumaCena)
-    bpy.utils.register_class(liberGeraModelosTomoArc)
     bpy.utils.register_class(ImportaCorte)
     bpy.utils.register_class(AlinhaArcada2)
     bpy.utils.register_class(ImportaAlinhaArcada)
@@ -1422,7 +1354,6 @@ def register():
 def unregister():
     bpy.utils.unregister_class(LiberAtualizaScript)
     bpy.utils.unregister_class(LiberArrumaCena)
-    bpy.utils.unregister_class(liberGeraModelosTomoArc)
     bpy.utils.unregister_class(ImportaCorteSup)
     bpy.utils.register_class(arcadaCortaInf)
     bpy.utils.unregister_class(AlinhaArcada2)
