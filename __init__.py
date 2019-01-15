@@ -1192,6 +1192,66 @@ class LiberPreparaDenteManInf(bpy.types.Operator):
         LiberPreparaDenteManInfDef(self, context)
         return {'FINISHED'}
 
+# Desenha Pad
+
+def LiberPadExtDef(self, context):
+
+    bpy.ops.object.duplicate_move(OBJECT_OT_duplicate={"linked":False, "mode":'TRANSLATION'}, TRANSFORM_OT_translate={"value":(0, 0, 0), "constraint_axis":(False, False, False), "constraint_orientation":'GLOBAL', "mirror":False, "proportional":'DISABLED', "proportional_edit_falloff":'SMOOTH', "proportional_size":1, "snap":False, "snap_target":'CLOSEST', "snap_point":(0, 0, 0), "snap_align":False, "snap_normal":(0, 0, 0), "gpencil_strokes":False, "texture_space":False, "remove_on_cancel":False, "release_confirm":False})
+
+
+    bpy.ops.gpencil.convert(type='POLY')
+    bpy.ops.gpencil.layer_remove()
+    bpy.ops.object.editmode_toggle()
+    bpy.ops.mesh.knife_project()
+    bpy.ops.mesh.select_mode(type="FACE")
+    bpy.ops.mesh.select_all(action='INVERT')
+    bpy.ops.mesh.delete(type='FACE')
+    bpy.ops.object.editmode_toggle()
+    
+    bpy.ops.object.modifier_add(type='SOLIDIFY')
+    bpy.context.object.modifiers["Solidify"].thickness = -0.5
+    
+    bpy.ops.object.modifier_add(type='REMESH')
+    bpy.context.object.modifiers["Remesh"].mode = 'SMOOTH'
+    bpy.context.object.modifiers["Remesh"].octree_depth = 6
+    bpy.context.object.modifiers["Remesh"].scale = 0.99
+    bpy.ops.object.modifier_add(type='SMOOTH')
+    bpy.context.object.modifiers["Smooth"].factor = 2
+    bpy.context.object.modifiers["Smooth"].iterations = 6
+
+    scene = bpy.context.scene 
+
+    try:
+        mat = bpy.data.materials['Pad']
+        print("Material existe")
+        activeObject = bpy.context.active_object 
+        bpy.ops.object.material_slot_remove()
+        me = activeObject.data
+        me.materials.append(mat)
+        
+    except KeyError:
+        print("Não existe")
+        activeObject = bpy.context.active_object 
+        bpy.ops.object.material_slot_remove()
+        mat = bpy.data.materials.new(name="Pad")
+        activeObject.data.materials.append(mat) 
+        bpy.context.object.active_material.diffuse_color = (0.8, 0.49, 0.025)
+
+    bpy.ops.object.select_all(action='DESELECT')
+    a = bpy.data.objects['GP_Layer']
+    a.select = True
+    bpy.context.scene.objects.active = a
+    bpy.ops.object.delete(use_global=False)
+
+class LiberPadExt(bpy.types.Operator):
+    """Tooltip"""
+    bl_idname = "object.liber_extruda_desenho"
+    bl_label = "Desenha Corte"
+    
+    def execute(self, context):
+        LiberPadExtDef(self, context)
+        return {'FINISHED'}
+
 #ATUALIZA VERSAO
 class LiberPainelAtualiza(bpy.types.Panel):
     """Planejamento de Ortodontia no Blender"""
@@ -1329,7 +1389,46 @@ class liberBotoesArcada(bpy.types.Panel):
         row.operator("screen.animation_play", text="", icon="PLAY_REVERSE").reverse=True
         row.operator("anim.animalocrot", text="", icon="CLIP")
         row.operator("screen.animation_play", text="", icon="PLAY")
-        row.operator("screen.frame_jump", text="End", icon="FF").end=True     
+        row.operator("screen.frame_jump", text="End", icon="FF").end=True  
+
+# Draw Pad
+
+        row = layout.row()
+        row.label(text="Create Pad:")
+
+        if context.space_data.type == 'VIEW_3D':
+                propname = "gpencil_stroke_placement_view3d"
+        elif context.space_data.type == 'SEQUENCE_EDITOR':
+                propname = "gpencil_stroke_placement_sequencer_preview"
+        elif context.space_data.type == 'IMAGE_EDITOR':
+                propname = "gpencil_stroke_placement_image_editor"
+        else:
+                propname = "gpencil_stroke_placement_view2d"
+
+        ts = context.tool_settings
+
+        col = layout.column(align=True)
+
+        col.label(text="Stroke Placement:")
+
+        row = col.row(align=True)
+        row.prop_enum(ts, propname, 'VIEW')
+        row.prop_enum(ts, propname, 'CURSOR')
+
+        if context.space_data.type == 'VIEW_3D':
+            row = col.row(align=True)
+            row.prop_enum(ts, propname, 'SURFACE')
+            row.prop_enum(ts, propname, 'STROKE')
+
+            row = col.row(align=False)
+            row.active = getattr(ts, propname) in {'SURFACE', 'STROKE'}
+            row.prop(ts, "use_gpencil_stroke_endpoints")        
+
+        row = layout.row()
+        row.operator("gpencil.draw", icon='LINE_DATA', text="Draw Pad").mode = 'DRAW_POLY'
+
+        row = layout.row()
+        row.operator("object.liber_extruda_desenho", text="Extrude", icon="CURSOR")     
         
     
 def register():
@@ -1349,6 +1448,8 @@ def register():
     bpy.utils.register_class(LiberPreparaDenteManSup)
     bpy.utils.register_class(LiberPreparaDenteManInf)
     bpy.utils.register_class(liberBotoesArcada)
+    bpy.utils.register_class(LiberPadExt)
+    bpy.utils.register_class(LiberPreparaImpreBotoes)
 
     
 def unregister():
@@ -1368,6 +1469,9 @@ def unregister():
     bpy.utils.unregister_class(LiberPreparaDenteManSup)
     bpy.utils.unregister_class(LiberPreparaDenteManInf)
     bpy.utils.unregister_class(liberBotoesArcada)
+    bpy.utils.unregister_class(LiberPadExt)
+    bpy.utils.unregister_class(LiberPreparaImpreBotoes)
+
         
 if __name__ == "__main__":
     register()
