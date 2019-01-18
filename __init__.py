@@ -1255,7 +1255,7 @@ class LiberPadExt(bpy.types.Operator):
 #ATUALIZA VERSAO
 class LiberPainelAtualiza(bpy.types.Panel):
     """Planejamento de Ortodontia no Blender"""
-    bl_label = "Upgrade RhinOnBlender"
+    bl_label = "Upgrade LiberTeeth3D"
     bl_idname = "liber_atualiza"
     bl_space_type = 'VIEW_3D'
     bl_region_type = 'TOOLS'
