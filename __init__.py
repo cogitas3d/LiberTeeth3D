@@ -1267,7 +1267,7 @@ class LiberPainelAtualiza(bpy.types.Panel):
         obj = context.object 
 		
         row = layout.row()
-        row.label(text="VERSION: 20181218a")
+        row.label(text="VERSION: 20190118a")
 
         row = layout.row()
         row.operator("object.liber_atualiza_script", text="UPGRADE LIBER!", icon="RECOVER_LAST")
