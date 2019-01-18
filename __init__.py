@@ -28,10 +28,10 @@ def LiberAtualizaScriptDef(self, context):
 	if platform.system() == "Windows":
 
 		arquivo = open('atualiza_liber.bat', 'w+')
-		arquivo.writelines("""cd C:\OrtogOnBlender\Blender\2.78\scripts\addons && ^
+		arquivo.writelines("""cd C:/OrtogOnBlender/Blender/2.78/scripts/addons && ^
 rd /s /q LiberTeeth3D-master && ^
-C:\OrtogOnBlender\Python27\python.exe -c "import urllib; urllib.urlretrieve ('https://github.com/cogitas3d/LiberTeeth3D/archive/master.zip', 'master.zip')" && ^
-C:\OrtogOnBlender\7-Zip\7z x  master.zip && ^
+C:/OrtogOnBlender/Python27/python.exe -c "import urllib; urllib.urlretrieve ('https://github.com/cogitas3d/LiberTeeth3D/archive/master.zip', 'master.zip')" && ^
+C:/OrtogOnBlender/7-Zip/7z x  master.zip && ^
 del master.zip""")
 
 		arquivo.close()
