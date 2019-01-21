@@ -21,6 +21,8 @@ import shutil
 import subprocess
 from math import sqrt
 
+from .CriaSplintWeight import *
+
 # ATUALIACAO DO SCRIPT
 
 def LiberAtualizaScriptDef(self, context):
@@ -1428,10 +1430,24 @@ class liberBotoesArcada(bpy.types.Panel):
         row.operator("gpencil.draw", icon='LINE_DATA', text="Draw Pad").mode = 'DRAW_POLY'
 
         row = layout.row()
-        row.operator("object.liber_extruda_desenho", text="Extrude", icon="CURSOR")     
-        
+        row.operator("object.liber_extruda_desenho", text="Extrude", icon="CURSOR")
+
+        row = layout.row()
+        row.label(text="Splint:")
+
+        row = layout.row()
+        row.operator("object.liber_weight_1", text="Weight Paint 1", icon="COLOR_RED") 
+
+        row = layout.row()
+        row.operator("object.liber_weight_0", text="Weight Paint 0", icon="COLOR_BLUE")     
+
+        row = layout.row()
+        row.operator("object.liber_splint_weight", text="Create Splint!", icon="FILE_TICK")        
     
 def register():
+    bpy.utils.register_class(LiberSplintWeight)
+    bpy.utils.register_class(LiberWeight1)
+    bpy.utils.register_class(LiberWeight0)
     bpy.utils.register_class(LiberAtualizaScript)
     bpy.utils.register_class(LiberArrumaCena)
     bpy.utils.register_class(ImportaCorte)
@@ -1453,6 +1469,9 @@ def register():
 
     
 def unregister():
+    bpy.utils.unregister_class(LiberSplintWeight)
+    bpy.utils.unregister_class(LiberWeight1)
+    bpy.utils.unregister_class(LiberWeight0)
     bpy.utils.unregister_class(LiberAtualizaScript)
     bpy.utils.unregister_class(LiberArrumaCena)
     bpy.utils.unregister_class(ImportaCorteSup)
