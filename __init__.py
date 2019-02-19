@@ -852,16 +852,18 @@ class liberCriaFotogrametria(bpy.types.Panel):
         row = layout.row()
         row.operator("object.liber_gera_modelo_foto", text="Start Photogrammetry!", icon="IMAGE_DATA")
 
+
         row = layout.row()        
         row.label(text="Align and Resize:")
-        layout.operator("object.alinha_rosto", text="1 - Align with the Camera", icon="MANIPUL")
-        col = self.layout.column(align = True)
-        col.prop(context.scene, "medida_real")  
-        layout.operator("object.alinha_rosto2", text="3 - Align and resize", icon="LAMP_POINT")
-        
-        
+ 
         row = layout.row()
-        row.operator("object.liber_flip_y", text="Flip Y", icon="FILE_REFRESH")
+        row.operator("object.cria_tres_pontos", text="3 Points Click", icon="OUTLINER_OB_MESH")
+
+        col = self.layout.column(align = True)
+        col.prop(context.scene, "medida_real2")  
+
+        row = layout.row()
+        row.operator("object.alinha_forca", text="Align and Resize!", icon="LAMP_POINT")
 
         row = layout.row()
         row.label(text="CT-Scan Reconstruction:")
@@ -1269,7 +1271,7 @@ class LiberPainelAtualiza(bpy.types.Panel):
         obj = context.object 
 		
         row = layout.row()
-        row.label(text="VERSION: 20190118a")
+        row.label(text="VERSION: 20190219a")
 
         row = layout.row()
         row.operator("object.liber_atualiza_script", text="UPGRADE LIBER!", icon="RECOVER_LAST")
@@ -1465,7 +1467,7 @@ def register():
     bpy.utils.register_class(LiberPreparaDenteManInf)
     bpy.utils.register_class(liberBotoesArcada)
     bpy.utils.register_class(LiberPadExt)
-    bpy.utils.register_class(LiberPreparaImpreBotoes)
+#    bpy.utils.register_class(LiberPreparaImpreBotoes)
 
     
 def unregister():
@@ -1489,7 +1491,7 @@ def unregister():
     bpy.utils.unregister_class(LiberPreparaDenteManInf)
     bpy.utils.unregister_class(liberBotoesArcada)
     bpy.utils.unregister_class(LiberPadExt)
-    bpy.utils.unregister_class(LiberPreparaImpreBotoes)
+#    bpy.utils.unregister_class(LiberPreparaImpreBotoes)
 
         
 if __name__ == "__main__":
